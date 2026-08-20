@@ -45,14 +45,14 @@ export default function YearView({ currency, onOpenMonth }: {
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 4, right: 4, left: -18, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#00000010" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
               <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false}
                 tickFormatter={(value) => `${Math.round(Number(value) / 1000)}k`} />
               <Tooltip formatter={(value) => formatMoney(Number(value), currency)} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="Presupuesto" fill="#c8973f" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="Gastado" fill="#0f1720" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Presupuesto" fill="#d4d4d4" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="Gastado" fill="#171717" radius={[2, 2, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -62,44 +62,44 @@ export default function YearView({ currency, onOpenMonth }: {
         <div className="-mx-2 overflow-x-auto">
           <table className="w-full text-[13px] sm:text-sm">
             <thead>
-              <tr className="text-left text-[11px] uppercase tracking-wide text-ink/50">
+              <tr className="text-left text-[11px] text-neutral-500">
                 <th className="px-1 py-2 font-medium">Mes</th>
                 <th className="px-1 py-2 text-right font-medium">Presup.</th>
                 <th className="px-1 py-2 text-right font-medium">Gastado</th>
                 <th className="px-1 py-2 text-right font-medium">Restante</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-black/5">
+            <tbody className="divide-y divide-line">
               {rows.map((row) => (
                 <tr
                   key={row.key}
                   onClick={() => onOpenMonth(row.key)}
-                  className="cursor-pointer hover:bg-black/[0.02]"
+                  className="cursor-pointer hover:bg-neutral-50"
                 >
                   <td className="px-1 py-2 font-medium">{row.name}</td>
-                  <td className="px-1 py-2 text-right tabular-nums text-ink/60">{formatAmount(show(row.budget))}</td>
+                  <td className="px-1 py-2 text-right tabular-nums text-neutral-500">{formatAmount(show(row.budget))}</td>
                   <td className="px-1 py-2 text-right tabular-nums">{formatAmount(show(row.spent))}</td>
-                  <td className={`px-1 py-2 text-right font-medium tabular-nums ${row.remaining < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                  <td className={`px-1 py-2 text-right font-medium tabular-nums ${row.remaining < 0 ? 'text-red-700' : 'text-emerald-700'}`}>
                     {formatAmount(show(row.remaining))}
                   </td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
-              <tr className="border-t-2 border-black/10 font-semibold">
+              <tr className="border-t-2 border-neutral-300 font-semibold">
                 <td className="px-1 py-2">Total</td>
                 <td className="px-1 py-2 text-right tabular-nums">{formatAmount(show(totals.budget))}</td>
                 <td className="px-1 py-2 text-right tabular-nums">{formatAmount(show(totals.spent))}</td>
-                <td className={`px-1 py-2 text-right tabular-nums ${totals.remaining < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                <td className={`px-1 py-2 text-right tabular-nums ${totals.remaining < 0 ? 'text-red-700' : 'text-emerald-700'}`}>
                   {formatAmount(show(totals.remaining))}
                 </td>
               </tr>
             </tfoot>
           </table>
         </div>
-        <p className="mt-3 text-xs text-ink/50">
+        <p className="mt-3 text-xs text-neutral-500">
           Media de gasto en los {active.length} meses con movimientos:{' '}
-          <Money aed={average} currency={currency} rate={rate} className="font-medium text-ink/70" />
+          <Money aed={average} currency={currency} rate={rate} className="font-medium text-neutral-600" />
         </p>
       </Card>
     </div>

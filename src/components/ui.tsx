@@ -23,7 +23,7 @@ export const Card = ({ title, action, children, className = '' }: {
   <section className={`card ${className}`}>
     {(title || action) && (
       <header className="mb-3 flex items-center justify-between gap-3">
-        {title && <h2 className="text-sm font-semibold uppercase tracking-wide text-ink/60">{title}</h2>}
+        {title && <h2 className="text-sm font-medium text-neutral-900">{title}</h2>}
         {action}
       </header>
     )}
@@ -38,24 +38,24 @@ export const Stat = ({ label, value, hint, tone = 'neutral' }: {
   tone?: 'neutral' | 'good' | 'bad'
 }) => {
   const tones = {
-    neutral: 'text-ink',
-    good: 'text-emerald-600',
-    bad: 'text-rose-600',
+    neutral: 'text-neutral-900',
+    good: 'text-emerald-700',
+    bad: 'text-red-700',
   }
   return (
     <div className="card">
-      <p className="text-xs font-medium uppercase tracking-wide text-ink/50">{label}</p>
+      <p className="text-xs text-neutral-500">{label}</p>
       <p className={`mt-1 text-xl font-semibold sm:text-2xl ${tones[tone]}`}>{value}</p>
-      {hint && <p className="mt-1 text-xs text-ink/50">{hint}</p>}
+      {hint && <p className="mt-1 text-xs text-neutral-500">{hint}</p>}
     </div>
   )
 }
 
 export const Progress = ({ value }: { value: number }) => {
   const pct = Math.min(100, Math.max(0, value * 100))
-  const color = pct < 75 ? 'bg-emerald-500' : pct < 100 ? 'bg-amber-500' : 'bg-rose-500'
+  const color = pct < 100 ? 'bg-neutral-900' : 'bg-red-700'
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-black/10">
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-200">
       <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
     </div>
   )
@@ -65,14 +65,14 @@ export const CurrencyToggle = ({ value, onChange }: {
   value: Currency
   onChange: (currency: Currency) => void
 }) => (
-  <div className="inline-flex rounded-xl border border-white/20 p-0.5">
+  <div className="inline-flex overflow-hidden rounded-md border border-neutral-300">
     {(['AED', 'EUR'] as const).map((option) => (
       <button
         key={option}
         type="button"
         onClick={() => onChange(option)}
-        className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
-          value === option ? 'bg-white text-ink' : 'text-white/70 hover:text-white'
+        className={`px-2.5 py-1 text-xs transition ${
+          value === option ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:text-neutral-900'
         }`}
       >
         {option}

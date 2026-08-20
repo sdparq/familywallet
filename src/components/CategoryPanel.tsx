@@ -5,9 +5,9 @@ import { useData } from '../lib/store'
 import type { Currency } from '../lib/types'
 import { Card, Money } from './ui'
 
-/** Paleta cálida, repetida si hay más categorías que colores. */
-const COLORS = ['#c8973f', '#0f1720', '#7d8f69', '#b4614a', '#4a6fa5', '#8a6fa5',
-  '#d0a98f', '#5f6b7a', '#a5804a', '#6b8f8a']
+/** Escala de grises de más a menos gasto; se repite si hay muchas categorías. */
+const COLORS = ['#171717', '#404040', '#525252', '#737373', '#8f8f8f', '#a3a3a3',
+  '#b5b5b5', '#c4c4c4', '#d4d4d4', '#e0e0e0']
 
 export default function CategoryPanel({ currency, month }: { currency: Currency; month: string }) {
   const { data } = useData()
@@ -37,7 +37,7 @@ export default function CategoryPanel({ currency, month }: { currency: Currency;
         </ResponsiveContainer>
       </div>
 
-      <ul className="mt-2 divide-y divide-black/5">
+      <ul className="mt-2 divide-y divide-line">
         {totals.map((entry, index) => (
           <li key={entry.category} className="flex items-center justify-between gap-3 py-1.5 text-sm">
             <span className="flex min-w-0 items-center gap-2">
@@ -46,11 +46,11 @@ export default function CategoryPanel({ currency, month }: { currency: Currency;
                 style={{ background: COLORS[index % COLORS.length] }}
               />
               <span className="truncate">{entry.category}</span>
-              <span className="shrink-0 text-xs text-ink/40">{entry.count}</span>
+              <span className="shrink-0 text-xs text-neutral-400">{entry.count}</span>
             </span>
             <span className="shrink-0 text-right">
               <Money aed={entry.total} currency={currency} rate={rate} className="font-medium" />
-              <span className="ml-2 text-xs text-ink/40">
+              <span className="ml-2 text-xs text-neutral-400">
                 {Math.round((entry.total / grandTotal) * 100)}%
               </span>
             </span>

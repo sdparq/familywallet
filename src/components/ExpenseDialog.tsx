@@ -72,7 +72,7 @@ export default function ExpenseDialog({ month, editing, onClose }: {
       <form
         onSubmit={save}
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-md space-y-3 rounded-t-2xl bg-white p-4 shadow-xl sm:rounded-2xl"
+        className="w-full max-w-md space-y-3 rounded-t-lg border border-line bg-white p-4 sm:rounded-lg"
       >
         <h2 className="text-lg font-semibold">{editing ? 'Editar gasto' : 'Nuevo gasto'}</h2>
 
@@ -99,14 +99,14 @@ export default function ExpenseDialog({ month, editing, onClose }: {
           </div>
           <div>
             <span className="label">Moneda</span>
-            <div className="inline-flex rounded-xl border border-black/10 p-0.5">
+            <div className="inline-flex rounded-md border border-line p-0.5">
               {(['AED', 'EUR'] as Currency[]).map((option) => (
                 <button
                   key={option}
                   type="button"
                   onClick={() => patch({ currency: option })}
                   className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
-                    draft.currency === option ? 'bg-ink text-white' : 'text-ink/60'
+                    draft.currency === option ? 'bg-neutral-900 text-white' : 'text-neutral-500'
                   }`}
                 >
                   {option}
@@ -167,7 +167,7 @@ export default function ExpenseDialog({ month, editing, onClose }: {
 
         <div className="flex gap-2 pt-1">
           {editing && (
-            <button type="button" className="btn-ghost text-rose-600" onClick={remove}>Borrar</button>
+            <button type="button" className="btn-ghost text-red-700" onClick={remove}>Borrar</button>
           )}
           <button type="button" className="btn-ghost ml-auto" onClick={onClose}>Cancelar</button>
           <button type="submit" className="btn-primary">Guardar</button>

@@ -27,7 +27,7 @@ export default function SavingsView({ currency }: { currency: Currency }) {
         <p className="text-2xl font-semibold">
           <Money aed={monthly} currency={currency} rate={rate} />
         </p>
-        <p className="mt-1 text-xs text-ink/50">
+        <p className="mt-1 text-xs text-neutral-500">
           Cuentas de ahorro y fondos de emergencia. Se descuenta del disponible de cada mes.
         </p>
       </Card>
@@ -52,7 +52,7 @@ export default function SavingsView({ currency }: { currency: Currency }) {
             action={
               <button
                 type="button"
-                className="text-xs font-medium text-gold hover:underline"
+                className="text-xs font-medium text-neutral-600 underline hover:text-neutral-900"
                 onClick={() => setGroup(id, [...items, {
                   id: `${slug(title)}-${items.length + 1}-${Date.now()}`,
                   name: 'Nueva línea',
@@ -65,10 +65,10 @@ export default function SavingsView({ currency }: { currency: Currency }) {
               </button>
             }
           >
-            {note && <p className="-mt-1 mb-3 text-xs text-ink/50">{note}</p>}
+            {note && <p className="-mt-1 mb-3 text-xs text-neutral-500">{note}</p>}
             <div className="space-y-3">
               {items.map((item) => (
-                <div key={item.id} className="rounded-xl border border-black/5 p-3">
+                <div key={item.id} className="rounded-md border border-line p-3">
                   <div className="flex items-center gap-2">
                     <input
                       className="field font-medium"
@@ -77,7 +77,7 @@ export default function SavingsView({ currency }: { currency: Currency }) {
                     />
                     <button
                       type="button"
-                      className="shrink-0 px-2 text-lg text-ink/30 hover:text-rose-600"
+                      className="shrink-0 px-2 text-lg text-neutral-400 hover:text-red-700"
                       title="Quitar"
                       onClick={() => confirm(`¿Quitar "${item.name}"?`) &&
                         setGroup(id, items.filter((other) => other.id !== item.id))}
@@ -100,24 +100,24 @@ export default function SavingsView({ currency }: { currency: Currency }) {
                       </label>
                     ))}
                   </div>
-                  <p className="mt-2 text-right text-xs text-ink/50">
+                  <p className="mt-2 text-right text-xs text-neutral-500">
                     Saldo final{' '}
                     <Money
                       aed={item.contribution + item.initialBalance}
                       currency={currency}
                       rate={rate}
-                      className="font-semibold text-ink/70"
+                      className="font-semibold text-neutral-600"
                     />
                   </p>
                 </div>
               ))}
-              {items.length === 0 && <p className="py-3 text-center text-sm text-ink/50">Sin líneas.</p>}
+              {items.length === 0 && <p className="py-3 text-center text-sm text-neutral-500">Sin líneas.</p>}
             </div>
-            <p className="mt-3 flex justify-between border-t border-black/10 pt-2 text-sm font-semibold">
+            <p className="mt-3 flex justify-between border-t border-line pt-2 text-sm font-semibold">
               <span>Total {title.toLowerCase()}</span>
               <span>
                 <Money aed={total.contribution} currency={currency} rate={rate} />
-                <span className="ml-2 font-normal text-ink/50">
+                <span className="ml-2 font-normal text-neutral-500">
                   saldo <Money aed={total.balance} currency={currency} rate={rate} />
                 </span>
               </span>

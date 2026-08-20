@@ -24,7 +24,7 @@ export default function MonthIncomePanel({ currency, month }: { currency: Curren
     <Card
       title="Ingresos del mes"
       action={isAdjusted && (
-        <button type="button" className="text-xs font-medium text-gold hover:underline" onClick={reset}>
+        <button type="button" className="text-xs font-medium text-neutral-600 underline hover:text-neutral-900" onClick={reset}>
           Volver al importe base
         </button>
       )}
@@ -45,7 +45,7 @@ export default function MonthIncomePanel({ currency, month }: { currency: Curren
           </li>
         ))}
       </ul>
-      <p className="mt-3 flex justify-between border-t border-black/10 pt-2 text-sm font-semibold">
+      <p className="mt-3 flex justify-between border-t border-line pt-2 text-sm font-semibold">
         <span>Total ingresos</span>
         <Money
           aed={items.reduce((sum, item) => sum + (item.currency === 'AED' ? item.amount : item.amount / rate), 0)}
@@ -54,7 +54,7 @@ export default function MonthIncomePanel({ currency, month }: { currency: Curren
         />
       </p>
       {!isAdjusted && (
-        <p className="mt-2 text-xs text-ink/50">
+        <p className="mt-2 text-xs text-neutral-500">
           Estos son los ingresos base. Si los cambias, el ajuste se guarda solo para este mes.
         </p>
       )}

@@ -43,7 +43,7 @@ export default function App() {
   if (!data) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
-        <p className="text-ink/60">{status === 'loading' ? 'Cargando…' : error}</p>
+        <p className="text-neutral-500">{status === 'loading' ? 'Cargando…' : error}</p>
         {status === 'error' && (
           <div className="flex gap-2">
             <button type="button" className="btn-primary" onClick={reload}>Reintentar</button>
@@ -56,32 +56,33 @@ export default function App() {
 
   return (
     <div className="min-h-screen pb-24">
-      <header className="sticky top-0 z-20 bg-ink text-white shadow-lg">
-        <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-gold">Dubai · {data.year}</p>
-            <h1 className="text-lg font-semibold leading-tight">Family Wallet</h1>
-          </div>
+      <header className="sticky top-0 z-20 border-b border-line bg-white">
+        <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 pt-3">
+          <h1 className="font-semibold">
+            Family Wallet <span className="font-normal text-neutral-400">{data.year}</span>
+          </h1>
           <div className="flex items-center gap-2">
-            {saving && <span className="text-[11px] text-white/50">Guardando…</span>}
+            {saving && <span className="text-[11px] text-neutral-400">Guardando…</span>}
             <CurrencyToggle value={currency} onChange={setCurrency} />
             <button
               type="button"
               onClick={signOut}
-              className="rounded-xl border border-white/20 px-3 py-1 text-xs text-white/70 hover:text-white"
+              className="px-1 text-xs text-neutral-500 underline hover:text-neutral-900"
             >
               Salir
             </button>
           </div>
         </div>
-        <nav className="mx-auto flex max-w-4xl gap-1 px-2 pb-1">
+        <nav className="mx-auto flex max-w-4xl gap-4 px-4">
           {TABS.map((item) => (
             <button
               key={item.id}
               type="button"
               onClick={() => setTab(item.id)}
-              className={`flex-1 rounded-t-lg px-3 py-2 text-sm font-medium transition ${
-                tab === item.id ? 'bg-sand text-ink' : 'text-white/60 hover:text-white'
+              className={`-mb-px border-b-2 py-2 text-sm transition ${
+                tab === item.id
+                  ? 'border-neutral-900 font-medium text-neutral-900'
+                  : 'border-transparent text-neutral-500 hover:text-neutral-900'
               }`}
             >
               {item.label}
@@ -91,7 +92,7 @@ export default function App() {
       </header>
 
       {error && (
-        <p className="mx-auto mt-3 max-w-4xl rounded-xl bg-rose-100 px-4 py-2 text-sm text-rose-700">
+        <p className="mx-auto mt-3 max-w-4xl rounded-md bg-rose-100 px-4 py-2 text-sm text-rose-700">
           {error}
         </p>
       )}

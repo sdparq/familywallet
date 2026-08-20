@@ -6,6 +6,8 @@ import type { Op, WalletData } from './types'
 
 interface Store {
   data: WalletData | null
+  /** Necesaria para las llamadas que no pasan por dispatch, como la importación. */
+  key: string
   status: 'locked' | 'loading' | 'ready' | 'error'
   error: string | null
   saving: boolean
@@ -83,8 +85,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   }, [key])
 
   const value = useMemo<Store>(
-    () => ({ data, status, error, saving, signIn, signOut, dispatch, reload: () => void load(key) }),
-    [data, status, error, saving, signIn, signOut, dispatch, load, key],
+    () => ({ data, key, status, error, saving, signIn, signOut, dispatch, reload: () => void load(key) }),
+    [data, key, status, error, saving, signIn, signOut, dispatch, load],
   )
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>

@@ -4,9 +4,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: '#0f1720',
-        sand: '#f6f4ef',
-        gold: '#c8973f',
+        // Gris neutro para texto y bordes; el color se reserva para saldos
+        line: '#e5e5e5',
       },
     },
   },

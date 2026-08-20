@@ -40,7 +40,7 @@ export default function SettingsView({ currency }: { currency: Currency }) {
       action={
         <button
           type="button"
-          className="text-xs font-medium text-gold hover:underline"
+          className="text-xs font-medium text-neutral-600 underline hover:text-neutral-900"
           onClick={() => setList(key, [...items, {
             id: `${slug(title)}-${Date.now()}`, name: 'Nueva línea', amount: 0, currency: 'AED',
           }])}
@@ -53,7 +53,7 @@ export default function SettingsView({ currency }: { currency: Currency }) {
         {items.map((item) => (
           <li
             key={item.id}
-            className="space-y-2 rounded-xl border border-black/5 p-2 sm:grid sm:grid-cols-[1fr_6.5rem_4.5rem_1.75rem]
+            className="space-y-2 rounded-md border border-line p-2 sm:grid sm:grid-cols-[1fr_6.5rem_4.5rem_1.75rem]
               sm:items-center sm:gap-2 sm:space-y-0 sm:border-0 sm:p-0"
           >
             <input
@@ -80,7 +80,7 @@ export default function SettingsView({ currency }: { currency: Currency }) {
             </select>
             <button
               type="button"
-              className="text-lg text-ink/30 hover:text-rose-600"
+              className="text-lg text-neutral-400 hover:text-red-700"
               title="Quitar"
               onClick={() => confirm(`¿Quitar "${item.name}"?`) &&
                 setList(key, items.filter((other) => other.id !== item.id))}
@@ -91,7 +91,7 @@ export default function SettingsView({ currency }: { currency: Currency }) {
           </li>
         ))}
       </ul>
-      <p className="mt-3 flex justify-between border-t border-black/10 pt-2 text-sm font-semibold">
+      <p className="mt-3 flex justify-between border-t border-line pt-2 text-sm font-semibold">
         <span>Total</span>
         <Money aed={sumAED(items, rate)} currency={currency} rate={rate} />
       </p>
@@ -109,7 +109,7 @@ export default function SettingsView({ currency }: { currency: Currency }) {
             onChange={(value) => value > 0 && dispatch({ type: 'settings.set', patch: { rate: value } })}
           />
         </label>
-        <p className="mt-2 text-xs text-ink/50">
+        <p className="mt-2 text-xs text-neutral-500">
           Euros por dírham. Se usa para convertir todos los importes entre AED y EUR.
         </p>
       </Card>
@@ -125,11 +125,11 @@ export default function SettingsView({ currency }: { currency: Currency }) {
             ['− Ahorros', -savings],
           ] as const).map(([label, amount]) => (
             <div key={label} className="flex justify-between gap-4">
-              <dt className="text-ink/70">{label}</dt>
+              <dt className="text-neutral-600">{label}</dt>
               <dd><Money aed={amount} currency={currency} rate={rate} /></dd>
             </div>
           ))}
-          <div className="flex justify-between gap-4 border-t border-black/10 pt-1 font-semibold">
+          <div className="flex justify-between gap-4 border-t border-line pt-1 font-semibold">
             <dt>= Disponible para gastar</dt>
             <dd><Money aed={income - fixed - savings} currency={currency} rate={rate} /></dd>
           </div>
@@ -141,12 +141,12 @@ export default function SettingsView({ currency }: { currency: Currency }) {
           {categories.map((category) => {
             const used = data.transactions.some((tx) => tx.category === category)
             return (
-              <span key={category} className="inline-flex items-center gap-1 rounded-full bg-black/5 px-3 py-1 text-sm">
+              <span key={category} className="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-3 py-1 text-sm">
                 {category}
                 {!used && (
                   <button
                     type="button"
-                    className="text-ink/40 hover:text-rose-600"
+                    className="text-neutral-400 hover:text-red-700"
                     title="Quitar categoría sin usar"
                     onClick={() => dispatch({
                       type: 'settings.set',
@@ -178,7 +178,7 @@ export default function SettingsView({ currency }: { currency: Currency }) {
           />
           <button type="submit" className="btn-ghost">Añadir</button>
         </form>
-        <p className="mt-2 text-xs text-ink/50">
+        <p className="mt-2 text-xs text-neutral-500">
           Solo se pueden quitar las categorías que no tengan ningún gasto asociado.
         </p>
       </Card>
@@ -187,7 +187,7 @@ export default function SettingsView({ currency }: { currency: Currency }) {
         <button type="button" className="btn-ghost w-full" onClick={exportCsv}>
           Descargar movimientos en CSV
         </button>
-        <p className="mt-2 text-xs text-ink/50">
+        <p className="mt-2 text-xs text-neutral-500">
           {data.transactions.length} movimientos guardados. El CSV se abre directamente en Excel.
         </p>
       </Card>
