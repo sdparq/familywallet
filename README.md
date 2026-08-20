@@ -24,7 +24,12 @@ mismos datos desde cualquier móvil u ordenador.
 ## Puesta en marcha en Netlify
 
 1. Conecta este repositorio en Netlify. La configuración de build ya está en
-   `netlify.toml` (comando `npm run build`, carpeta `dist`).
+   `netlify.toml` (comando `npm run build`, carpeta `dist`, Node 22).
+   **Comprueba la rama.** En *Site configuration → Build & deploy → Branches and
+   deploy contexts*, la *Production branch* tiene que ser
+   `claude/clever-lamport-ocfodj`, que es donde está este código. Si apunta a
+   otra rama, Netlify publicará otra versión de la app y los cambios de aquí no
+   aparecerán nunca.
 2. En **Site configuration → Environment variables**, crea la variable
    `APP_PASSWORD` con la contraseña compartida. Sin ella la app responde con un
    error explicando que falta.
@@ -33,6 +38,10 @@ mismos datos desde cualquier móvil u ordenador.
 
 Los datos viven en **Netlify Blobs**, que se activa solo: no hay que crear ninguna
 base de datos ni cuenta adicional.
+
+> **El repositorio debería ser privado.** `src/data/seed.json` y
+> `docs/2026_Budget_Template.xlsx` contienen los sueldos, el alquiler y todos los
+> movimientos. Netlify despliega igual desde un repositorio privado.
 
 ## Desarrollo en local
 
