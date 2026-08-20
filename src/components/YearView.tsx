@@ -21,13 +21,15 @@ export default function YearView({ currency, onOpenMonth }: {
   )
 
   const show = (aed: number) => Number((currency === 'AED' ? aed : toEUR(aed, 'AED', rate)).toFixed(2))
+  // Un mes sin movimientos no pinta barra: no hubo mes que medir
   const chartData = rows.map((row) => ({
     name: row.name.slice(0, 3),
-    Presupuesto: show(row.budget),
-    Gastado: show(row.spent),
+    Presupuesto: row.hasData ? show(row.budget) : null,
+    Gastado: row.hasData ? show(row.spent) : null,
   }))
 
-  const totals = rows.reduce(
+  const active = rows.filter((row) => row.hasData)
+  const totals = active.reduce(
     (sum, row) => ({
       budget: sum.budget + row.budget,
       spent: sum.spent + row.spent,
@@ -36,7 +38,6 @@ export default function YearView({ currency, onOpenMonth }: {
     { budget: 0, spent: 0, remaining: 0 },
   )
 
-  const active = rows.filter((row) => row.spent > 0)
   const average = active.length ? active.reduce((sum, row) => sum + row.spent, 0) / active.length : 0
 
   return (
@@ -76,12 +77,18 @@ export default function YearView({ currency, onOpenMonth }: {
                   onClick={() => onOpenMonth(row.key)}
                   className="cursor-pointer hover:bg-neutral-50"
                 >
-                  <td className="px-1 py-2 font-medium">{row.name}</td>
-                  <td className="px-1 py-2 text-right tabular-nums text-neutral-500">{formatAmount(show(row.budget))}</td>
-                  <td className="px-1 py-2 text-right tabular-nums">{formatAmount(show(row.spent))}</td>
-                  <td className={`px-1 py-2 text-right font-medium tabular-nums ${row.remaining < 0 ? 'text-red-700' : 'text-emerald-700'}`}>
-                    {formatAmount(show(row.remaining))}
-                  </td>
+                  <td className={`px-1 py-2 font-medium ${row.hasData ? '' : 'text-neutral-400'}`}>{row.name}</td>
+                  {row.hasData ? (
+                    <>
+                      <td className="px-1 py-2 text-right tabular-nums text-neutral-500">{formatAmount(show(row.budget))}</td>
+                      <td className="px-1 py-2 text-right tabular-nums">{formatAmount(show(row.spent))}</td>
+                      <td className={`px-1 py-2 text-right font-medium tabular-nums ${row.remaining < 0 ? 'text-red-700' : 'text-emerald-700'}`}>
+                        {formatAmount(show(row.remaining))}
+                      </td>
+                    </>
+                  ) : (
+                    <td className="px-1 py-2 text-right text-neutral-400" colSpan={3}>Sin datos</td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -98,8 +105,8 @@ export default function YearView({ currency, onOpenMonth }: {
           </table>
         </div>
         <p className="mt-3 text-xs text-neutral-500">
-          Media de gasto en los {active.length} meses con movimientos:{' '}
-          <Money aed={average} currency={currency} rate={rate} className="font-medium text-neutral-600" />
+          Los totales y la media cuentan solo los {active.length} meses con movimientos.
+          Media de gasto: <Money aed={average} currency={currency} rate={rate} className="font-medium text-neutral-600" />
         </p>
       </Card>
     </div>

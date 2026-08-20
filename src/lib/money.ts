@@ -48,6 +48,8 @@ export interface MonthSummary {
   budget: number
   spent: number
   remaining: number
+  /** false si el mes no tiene ningún movimiento: entonces no hay nada que contar. */
+  hasData: boolean
 }
 
 /** Todos los importes del resumen en AED; la vista los convierte a EUR con el tipo. */
@@ -56,8 +58,9 @@ export const summarizeMonth = (data: WalletData, month: string): MonthSummary =>
   const income = sumAED(incomesForMonth(data, month), rate)
   const fixed = sumAED(data.settings.fixedExpenses, rate)
   const budget = income - fixed
-  const spent = sumAED(data.transactions.filter((tx) => tx.month === month), rate)
-  return { income, fixed, budget, spent, remaining: budget - spent }
+  const movements = data.transactions.filter((tx) => tx.month === month)
+  const spent = sumAED(movements, rate)
+  return { income, fixed, budget, spent, remaining: budget - spent, hasData: movements.length > 0 }
 }
 
 export interface CategoryTotal {

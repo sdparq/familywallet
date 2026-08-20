@@ -83,6 +83,21 @@ src/components/              Pantallas: Mes, Año y Ajustes
 scripts/extract_seed.py      Importador del Excel
 ```
 
+## De dónde salen los datos
+
+Todo lo que trae la app viene del Excel, sin añadidos: 447 movimientos (enero y
+abril a julio), las tres líneas de ingresos, los 15 gastos fijos, las 19
+categorías y el tipo de cambio. `src/data/seed.json` se puede regenerar con el
+script y sale byte a byte igual.
+
+Los meses que no tenían nada en el Excel —febrero, marzo y de agosto a
+diciembre— aparecen como **Sin datos**: no suman en los totales del año, no
+pintan barra en el gráfico, y al abrirlos se avisa de que los ingresos y gastos
+fijos que se ven son la previsión del *Resumen*, no cifras reales de ese mes.
+
+Donde el Excel no anotaba fecha, el movimiento sale como *Sin fecha* en lugar de
+inventarle una.
+
 ## Apuntar rápido
 
 Tres formas de no ir gasto a gasto, todas gratis y sin salir del navegador.

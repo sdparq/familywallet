@@ -60,11 +60,18 @@ export default function MonthView({ currency, month, onMonthChange }: {
         <button type="button" className="btn-ghost px-3" onClick={() => step(1)} disabled={index === 11}>›</button>
       </div>
 
+      {!summary.hasData && (
+        <p className="rounded-md border border-line bg-neutral-50 px-3 py-2 text-sm text-neutral-600">
+          Este mes no tenía nada apuntado en el Excel. Los ingresos y los gastos fijos
+          son la previsión del Resumen, no cifras reales de {MONTH_NAMES[index]}.
+        </p>
+      )}
+
       <div className="grid grid-cols-2 gap-3">
         <Stat
           label="Ingresos"
           value={<Money aed={summary.income} currency={currency} rate={rate} />}
-          hint="Del mes"
+          hint={data.monthIncomes[month] ? 'Ajustados para este mes' : 'Previsión base'}
         />
         <Stat
           label="Gastos fijos"
@@ -74,7 +81,7 @@ export default function MonthView({ currency, month, onMonthChange }: {
         <Stat
           label="Gastado (variable)"
           value={<Money aed={summary.spent} currency={currency} rate={rate} />}
-          hint={`${transactions.length} movimientos`}
+          hint={transactions.length === 1 ? '1 movimiento' : `${transactions.length} movimientos`}
         />
         <Stat
           label="Restante"
