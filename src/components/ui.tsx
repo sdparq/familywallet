@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import type { ReactNode } from 'react'
 import type { Currency } from '../lib/types'
 import { formatMoney, toEUR } from '../lib/money'
@@ -81,20 +82,24 @@ export const CurrencyToggle = ({ value, onChange }: {
   </div>
 )
 
-/** Campo numérico que deja el input vacío mientras se escribe, sin forzar un 0. */
-export const NumberField = ({ value, onChange, className = '', ...rest }: {
+/** Campo numérico: al enfocarlo se selecciona todo, así escribir sustituye al 0. */
+export const NumberField = forwardRef<HTMLInputElement, {
   value: number
   onChange: (value: number) => void
   className?: string
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'>) => (
-  <input
-    {...rest}
-    type="number"
-    inputMode="decimal"
-    step="0.01"
-    className={`field text-right tabular-nums ${className}`}
-    value={Number.isFinite(value) ? String(value) : ''}
-    onFocus={(event) => event.target.select()}
-    onChange={(event) => onChange(event.target.value === '' ? 0 : Number(event.target.value))}
-  />
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'>>(
+  ({ value, onChange, className = '', ...rest }, ref) => (
+    <input
+      {...rest}
+      ref={ref}
+      type="number"
+      inputMode="decimal"
+      step="0.01"
+      className={`field text-right tabular-nums ${className}`}
+      value={Number.isFinite(value) ? String(value) : ''}
+      onFocus={(event) => event.target.select()}
+      onChange={(event) => onChange(event.target.value === '' ? 0 : Number(event.target.value))}
+    />
+  ),
 )
+NumberField.displayName = 'NumberField'

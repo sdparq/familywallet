@@ -18,29 +18,6 @@ const localApi = (): Plugin => ({
     const load = (): WalletData =>
       JSON.parse(readFileSync(existsSync(LOCAL_DB) ? LOCAL_DB : SEED, 'utf8'))
 
-    // La importación reutiliza el handler real, así en local se prueba lo mismo que se despliega
-    server.middlewares.use('/api/import', (request, response, next) => {
-      if (request.method !== 'POST') return next()
-      const chunks: Buffer[] = []
-      request.on('data', (chunk: Buffer) => chunks.push(chunk))
-      request.on('end', async () => {
-        try {
-          const module = await server.ssrLoadModule('/netlify/functions/import.mts')
-          const result: Response = await module.default(new Request('http://local/api/import', {
-            method: 'POST',
-            headers: { 'x-wallet-key': String(request.headers['x-wallet-key'] ?? '') },
-            body: Buffer.concat(chunks),
-          }))
-          response.statusCode = result.status
-          response.setHeader('content-type', 'application/json')
-          response.end(await result.text())
-        } catch (error) {
-          response.statusCode = 500
-          response.end(JSON.stringify({ error: (error as Error).message }))
-        }
-      })
-    })
-
     server.middlewares.use('/api/data', (request, response, next) => {
       if (request.headers['x-wallet-key'] !== (process.env.APP_PASSWORD ?? 'dubai')) {
         response.statusCode = 401

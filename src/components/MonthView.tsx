@@ -5,6 +5,7 @@ import ImportDialog from './ImportDialog'
 import MonthIncomePanel from './MonthIncomePanel'
 import { Card, Money, Progress, Stat } from './ui'
 import { MONTH_NAMES, monthKey, summarizeMonth, toAED } from '../lib/money'
+import { frequentConcepts } from '../lib/suggest'
 import { useData } from '../lib/store'
 import type { Currency, Transaction } from '../lib/types'
 
@@ -18,6 +19,7 @@ export default function MonthView({ currency, month, onMonthChange }: {
   const { data } = useData()
   const { rate } = data.settings
   const [editing, setEditing] = useState<Transaction | null>(null)
+  const [prefill, setPrefill] = useState<Partial<Transaction> | undefined>()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
 
@@ -33,8 +35,14 @@ export default function MonthView({ currency, month, onMonthChange }: {
     if (next >= 0 && next < 12) onMonthChange(monthKey(data.year, next))
   }
 
-  const openNew = () => { setEditing(null); setDialogOpen(true) }
-  const openEdit = (tx: Transaction) => { setEditing(tx); setDialogOpen(true) }
+  const frequent = useMemo(() => frequentConcepts(data.transactions), [data.transactions])
+
+  const openNew = (values?: Partial<Transaction>) => {
+    setEditing(null)
+    setPrefill(values)
+    setDialogOpen(true)
+  }
+  const openEdit = (tx: Transaction) => { setEditing(tx); setPrefill(undefined); setDialogOpen(true) }
 
   return (
     <div className="space-y-4">
@@ -103,13 +111,38 @@ export default function MonthView({ currency, month, onMonthChange }: {
       </Card>
 
       <div className="grid gap-2 sm:grid-cols-2">
-        <button type="button" className="btn-primary w-full py-3" onClick={openNew}>
+        <button type="button" className="btn-primary w-full py-3" onClick={() => openNew()}>
           Añadir gasto
         </button>
         <button type="button" className="btn-ghost w-full py-3" onClick={() => setImportOpen(true)}>
-          Importar de foto o vídeo
+          Pegar del banco
         </button>
       </div>
+
+      {frequent.length > 0 && (
+        <div>
+          <p className="mb-1.5 text-xs text-neutral-500">
+            Habituales — toca uno y solo tienes que poner el importe
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {frequent.map((item) => (
+              <button
+                key={item.concept}
+                type="button"
+                onClick={() => openNew({
+                  concept: item.concept,
+                  category: item.category,
+                  currency: item.currency,
+                })}
+                className="rounded-full border border-neutral-300 px-3 py-1.5 text-sm
+                  transition hover:border-neutral-900 hover:bg-neutral-50"
+              >
+                {item.concept}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <Card title="Registro semanal">
         {transactions.length === 0 ? (
@@ -169,7 +202,12 @@ export default function MonthView({ currency, month, onMonthChange }: {
       <MonthIncomePanel currency={currency} month={month} />
 
       {dialogOpen && (
-        <ExpenseDialog month={month} editing={editing} onClose={() => setDialogOpen(false)} />
+        <ExpenseDialog
+          month={month}
+          editing={editing}
+          prefill={prefill}
+          onClose={() => setDialogOpen(false)}
+        />
       )}
       {importOpen && <ImportDialog month={month} onClose={() => setImportOpen(false)} />}
     </div>
