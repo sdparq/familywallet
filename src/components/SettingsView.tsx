@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { savingsContribution, sumAED } from '../lib/money'
+import { sumAED } from '../lib/money'
 import { useData } from '../lib/store'
 import type { Currency, LineItem } from '../lib/types'
 import { Card, Money, NumberField } from './ui'
@@ -16,7 +16,6 @@ export default function SettingsView({ currency }: { currency: Currency }) {
 
   const income = sumAED(incomes, rate)
   const fixed = sumAED(fixedExpenses, rate)
-  const savings = savingsContribution(data)
 
   const setList = (key: 'incomes' | 'fixedExpenses', items: LineItem[]) =>
     dispatch({ type: 'settings.set', patch: { [key]: items } })
@@ -122,7 +121,6 @@ export default function SettingsView({ currency }: { currency: Currency }) {
           {([
             ['Total ingresos', income],
             ['− Gastos fijos', -fixed],
-            ['− Ahorros', -savings],
           ] as const).map(([label, amount]) => (
             <div key={label} className="flex justify-between gap-4">
               <dt className="text-neutral-600">{label}</dt>
@@ -131,7 +129,7 @@ export default function SettingsView({ currency }: { currency: Currency }) {
           ))}
           <div className="flex justify-between gap-4 border-t border-line pt-1 font-semibold">
             <dt>= Disponible para gastar</dt>
-            <dd><Money aed={income - fixed - savings} currency={currency} rate={rate} /></dd>
+            <dd><Money aed={income - fixed} currency={currency} rate={rate} /></dd>
           </div>
         </dl>
       </Card>

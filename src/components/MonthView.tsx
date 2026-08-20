@@ -67,9 +67,9 @@ export default function MonthView({ currency, month, onMonthChange }: {
           hint="Del mes"
         />
         <Stat
-          label="Gastos fijos + ahorro"
-          value={<Money aed={summary.fixed + summary.savings} currency={currency} rate={rate} />}
-          hint={<>Fijos <Money aed={summary.fixed} currency={currency} rate={rate} /> · Ahorro <Money aed={summary.savings} currency={currency} rate={rate} /></>}
+          label="Gastos fijos"
+          value={<Money aed={summary.fixed} currency={currency} rate={rate} />}
+          hint="Previsión mensual"
         />
         <Stat
           label="Gastado (variable)"
@@ -90,7 +90,6 @@ export default function MonthView({ currency, month, onMonthChange }: {
           {[
             ['Ingresos', summary.income],
             ['− Gastos fijos', -summary.fixed],
-            ['− Ahorro', -summary.savings],
             ['= Disponible para gastar', summary.budget],
             ['− Gastado', -summary.spent],
           ].map(([label, amount]) => (

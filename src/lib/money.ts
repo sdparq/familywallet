@@ -44,8 +44,7 @@ export const incomesForMonth = (data: WalletData, month: string): LineItem[] => 
 export interface MonthSummary {
   income: number
   fixed: number
-  savings: number
-  /** Presupuesto para gastos variables: ingresos − fijos − ahorro. */
+  /** Presupuesto para gastos variables: ingresos − gastos fijos. */
   budget: number
   spent: number
   remaining: number
@@ -56,14 +55,10 @@ export const summarizeMonth = (data: WalletData, month: string): MonthSummary =>
   const { rate } = data.settings
   const income = sumAED(incomesForMonth(data, month), rate)
   const fixed = sumAED(data.settings.fixedExpenses, rate)
-  const savings = savingsContribution(data)
-  const budget = income - fixed - savings
+  const budget = income - fixed
   const spent = sumAED(data.transactions.filter((tx) => tx.month === month), rate)
-  return { income, fixed, savings, budget, spent, remaining: budget - spent }
+  return { income, fixed, budget, spent, remaining: budget - spent }
 }
-
-export const savingsContribution = (data: WalletData) =>
-  [...data.savings.accounts, ...data.savings.emergency].reduce((total, item) => total + item.contribution, 0)
 
 export interface CategoryTotal {
   category: string

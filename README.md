@@ -12,8 +12,8 @@ mismos datos desde cualquier móvil u ordenador.
 - **Importes en AED o EUR.** Cada gasto se apunta en la moneda en la que se pagó y
   la app convierte con el tipo de cambio configurable (por defecto `1 AED = 0,24 €`).
   El interruptor de la cabecera cambia la moneda de toda la aplicación.
-- **Presupuesto del mes** = ingresos − gastos fijos − ahorro comprometido. Lo que
-  queda es el disponible para gastos variables, igual que en la hoja *Resumen*.
+- **Presupuesto del mes** = ingresos − gastos fijos. Lo que queda es el disponible
+  para gastos variables.
 - **Registro semanal.** Los gastos se agrupan en semanas 1 a 5. Si se indica fecha,
   la semana se calcula sola (y el gasto se coloca en su mes).
 - **Ingresos por mes.** Si un mes cobráis algo distinto, se edita en la pestaña
@@ -79,7 +79,7 @@ src/lib/suggest.ts           Gastos habituales y categorías sugeridas
 src/lib/apply.ts             Operaciones sobre los datos, compartidas cliente/servidor
 src/lib/money.ts             Conversión AED/EUR, presupuesto y totales por categoría
 src/lib/store.tsx            Estado de la app y sincronización con el servidor
-src/components/              Pantallas: Mes, Año, Ahorros y Ajustes
+src/components/              Pantallas: Mes, Año y Ajustes
 scripts/extract_seed.py      Importador del Excel
 ```
 
@@ -123,6 +123,15 @@ a partir de lo apuntado antes (si «Carrefour MOE» era Supermercado, «Carrefou
 City» también lo será). Sigue siendo editable. El botón *Guardar y otro* deja el
 formulario listo para el siguiente gasto sin cerrar la ventana, conservando la
 fecha.
+
+## Ahorros
+
+La pestaña de ahorros está retirada: descontaba una cantidad fija todos los meses
+y el ahorro real varía de un mes a otro. El disponible ya no la resta.
+
+Los datos (cuentas, fondos de emergencia y provisiones) siguen guardados en
+`savings`, con su operación `savings.set` y su sitio en el seed, esperando a que
+se monten los objetivos de ahorro. No hay que volver a meterlos.
 
 ## Conexión con el banco
 
