@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Login from './components/Login'
 import MonthView from './components/MonthView'
-import SettingsView from './components/SettingsView'
+import ForecastView from './components/ForecastView'
 import YearView from './components/YearView'
 import { CurrencyToggle } from './components/ui'
 import { monthKey } from './lib/money'
@@ -11,7 +11,7 @@ import type { Currency } from './lib/types'
 const TABS = [
   { id: 'month', label: 'Mes' },
   { id: 'year', label: 'Año' },
-  { id: 'settings', label: 'Ajustes' },
+  { id: 'forecast', label: 'Previsiones' },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
@@ -98,7 +98,7 @@ export default function App() {
       <main className="mx-auto max-w-4xl space-y-4 p-4">
         {tab === 'month' && <MonthView currency={currency} month={month} onMonthChange={setMonth} />}
         {tab === 'year' && <YearView currency={currency} onOpenMonth={(key) => { setMonth(key); setTab('month') }} />}
-        {tab === 'settings' && <SettingsView currency={currency} />}
+        {tab === 'forecast' && <ForecastView currency={currency} />}
       </main>
     </div>
   )

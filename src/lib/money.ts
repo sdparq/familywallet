@@ -43,24 +43,20 @@ export const incomesForMonth = (data: WalletData, month: string): LineItem[] => 
 
 export interface MonthSummary {
   income: number
-  fixed: number
-  /** Presupuesto para gastos variables: ingresos − gastos fijos. */
-  budget: number
   spent: number
-  remaining: number
+  /** Ingresos menos lo gastado. Solo cuenta lo apuntado, no previsiones. */
+  balance: number
   /** false si el mes no tiene ningún movimiento: entonces no hay nada que contar. */
   hasData: boolean
 }
 
-/** Todos los importes del resumen en AED; la vista los convierte a EUR con el tipo. */
+/** Todos los importes en AED; la vista los convierte a EUR con el tipo. */
 export const summarizeMonth = (data: WalletData, month: string): MonthSummary => {
   const { rate } = data.settings
   const income = sumAED(incomesForMonth(data, month), rate)
-  const fixed = sumAED(data.settings.fixedExpenses, rate)
-  const budget = income - fixed
   const movements = data.transactions.filter((tx) => tx.month === month)
   const spent = sumAED(movements, rate)
-  return { income, fixed, budget, spent, remaining: budget - spent, hasData: movements.length > 0 }
+  return { income, spent, balance: income - spent, hasData: movements.length > 0 }
 }
 
 export interface CategoryTotal {

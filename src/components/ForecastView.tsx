@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { sumAED } from '../lib/money'
+import { useMemo, useState } from 'react'
+import { MONTH_NAMES, monthKey, sumAED, summarizeMonth } from '../lib/money'
 import { useData } from '../lib/store'
 import type { Currency, LineItem } from '../lib/types'
 import { Card, Money, NumberField } from './ui'
@@ -9,13 +9,26 @@ const slug = (name: string) =>
 
 const CSV_HEADER = ['Mes', 'Semana', 'Fecha', 'Concepto', 'Categoría', 'Importe', 'Moneda']
 
-export default function SettingsView({ currency }: { currency: Currency }) {
+export default function ForecastView({ currency }: { currency: Currency }) {
   const { data, dispatch } = useData()
   const { rate, incomes, fixedExpenses, categories } = data.settings
   const [newCategory, setNewCategory] = useState('')
 
   const income = sumAED(incomes, rate)
   const fixed = sumAED(fixedExpenses, rate)
+
+  // Lo que de verdad pasó, para contrastarlo con la previsión
+  const real = useMemo(() => {
+    const months = MONTH_NAMES
+      .map((_, index) => summarizeMonth(data, monthKey(data.year, index)))
+      .filter((month) => month.hasData)
+    if (months.length === 0) return null
+    return {
+      months: months.length,
+      balance: months.reduce((sum, month) => sum + month.balance, 0) / months.length,
+      spent: months.reduce((sum, month) => sum + month.spent, 0) / months.length,
+    }
+  }, [data])
 
   const setList = (key: 'incomes' | 'fixedExpenses', items: LineItem[]) =>
     dispatch({ type: 'settings.set', patch: { [key]: items } })
@@ -33,7 +46,7 @@ export default function SettingsView({ currency }: { currency: Currency }) {
     URL.revokeObjectURL(url)
   }
 
-  const renderList = (key: 'incomes' | 'fixedExpenses', items: LineItem[], title: string) => (
+  const renderList = (key: 'incomes' | 'fixedExpenses', items: LineItem[], title: string, note?: string) => (
     <Card
       title={title}
       action={
@@ -94,11 +107,53 @@ export default function SettingsView({ currency }: { currency: Currency }) {
         <span>Total</span>
         <Money aed={sumAED(items, rate)} currency={currency} rate={rate} />
       </p>
+      {note && <p className="mt-2 text-xs text-neutral-500">{note}</p>}
     </Card>
   )
 
   return (
     <div className="space-y-4">
+      <Card title="Cuánto se puede ahorrar al mes">
+        <dl className="space-y-1 text-sm">
+          {([
+            ['Ingresos previstos', income],
+            ['− Gastos fijos previstos', -fixed],
+          ] as const).map(([label, amount]) => (
+            <div key={label} className="flex justify-between gap-4">
+              <dt className="text-neutral-600">{label}</dt>
+              <dd><Money aed={amount} currency={currency} rate={rate} /></dd>
+            </div>
+          ))}
+          <div className="flex justify-between gap-4 border-t border-line pt-1 font-semibold">
+            <dt>= Margen antes de gastos variables</dt>
+            <dd className={income - fixed < 0 ? 'text-red-700' : 'text-emerald-700'}>
+              <Money aed={income - fixed} currency={currency} rate={rate} />
+            </dd>
+          </div>
+        </dl>
+        {real && (
+          <p className="mt-3 border-t border-line pt-2 text-xs text-neutral-500">
+            En la realidad, en los {real.months} meses con movimientos se gastaron de media{' '}
+            <Money aed={real.spent} currency={currency} rate={rate} className="font-medium text-neutral-600" />
+            {' '}al mes y el balance medio fue{' '}
+            <Money
+              aed={real.balance}
+              currency={currency}
+              rate={rate}
+              className={`font-medium ${real.balance < 0 ? 'text-red-700' : 'text-emerald-700'}`}
+            />.
+          </p>
+        )}
+        <p className="mt-2 text-xs text-neutral-500">
+          Esto es una previsión: no toca las cifras de cada mes, que salen solo de lo
+          que apuntáis.
+        </p>
+      </Card>
+
+      {renderList('incomes', incomes, 'Ingresos previstos')}
+      {renderList('fixedExpenses', fixedExpenses, 'Gastos fijos previstos',
+        'Son los del Excel. Deja solo los que sabéis seguro (el alquiler, por ejemplo) y quita el resto con la ×; los gastos reales de cada mes se apuntan en la pestaña Mes.')}
+
       <Card title="Tipo de cambio">
         <label className="grid grid-cols-[1fr_8rem] items-center gap-3">
           <span className="text-sm">1 AED equivale a</span>
@@ -111,27 +166,6 @@ export default function SettingsView({ currency }: { currency: Currency }) {
         <p className="mt-2 text-xs text-neutral-500">
           Euros por dírham. Se usa para convertir todos los importes entre AED y EUR.
         </p>
-      </Card>
-
-      {renderList('incomes', incomes, 'Ingresos base')}
-      {renderList('fixedExpenses', fixedExpenses, 'Previsión de gastos fijos')}
-
-      <Card title="Distribución del ingreso">
-        <dl className="space-y-1 text-sm">
-          {([
-            ['Total ingresos', income],
-            ['− Gastos fijos', -fixed],
-          ] as const).map(([label, amount]) => (
-            <div key={label} className="flex justify-between gap-4">
-              <dt className="text-neutral-600">{label}</dt>
-              <dd><Money aed={amount} currency={currency} rate={rate} /></dd>
-            </div>
-          ))}
-          <div className="flex justify-between gap-4 border-t border-line pt-1 font-semibold">
-            <dt>= Disponible para gastar</dt>
-            <dd><Money aed={income - fixed} currency={currency} rate={rate} /></dd>
-          </div>
-        </dl>
       </Card>
 
       <Card title="Categorías">

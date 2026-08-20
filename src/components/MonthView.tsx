@@ -62,8 +62,8 @@ export default function MonthView({ currency, month, onMonthChange }: {
 
       {!summary.hasData && (
         <p className="rounded-md border border-line bg-neutral-50 px-3 py-2 text-sm text-neutral-600">
-          Este mes no tenía nada apuntado en el Excel. Los ingresos y los gastos fijos
-          son la previsión del Resumen, no cifras reales de {MONTH_NAMES[index]}.
+          {MONTH_NAMES[index]} no tenía nada apuntado en el Excel. Los ingresos que ves
+          son la previsión: si cobrasteis otra cosa, edítalos abajo.
         </p>
       )}
 
@@ -74,43 +74,27 @@ export default function MonthView({ currency, month, onMonthChange }: {
           hint={data.monthIncomes[month] ? 'Ajustados para este mes' : 'Previsión base'}
         />
         <Stat
-          label="Gastos fijos"
-          value={<Money aed={summary.fixed} currency={currency} rate={rate} />}
-          hint="Previsión mensual"
-        />
-        <Stat
-          label="Gastado (variable)"
+          label="Gastado"
           value={<Money aed={summary.spent} currency={currency} rate={rate} />}
           hint={transactions.length === 1 ? '1 movimiento' : `${transactions.length} movimientos`}
         />
-        <Stat
-          label="Restante"
-          value={<Money aed={summary.remaining} currency={currency} rate={rate} />}
-          tone={summary.remaining < 0 ? 'bad' : 'good'}
-          hint={<>de <Money aed={summary.budget} currency={currency} rate={rate} /> disponibles</>}
-        />
       </div>
 
-      <Card title="Presupuesto del mes">
-        <Progress value={summary.budget > 0 ? summary.spent / summary.budget : 0} />
+      <Card title="Balance del mes">
+        <Progress value={summary.income > 0 ? summary.spent / summary.income : 0} />
         <dl className="mt-3 space-y-1 text-sm text-neutral-600">
-          {[
-            ['Ingresos', summary.income],
-            ['− Gastos fijos', -summary.fixed],
-            ['= Disponible para gastar', summary.budget],
-            ['− Gastado', -summary.spent],
-          ].map(([label, amount]) => (
-            <div key={label as string} className="flex justify-between gap-4">
-              <dt className={String(label).startsWith('=') ? 'font-semibold text-neutral-900' : ''}>{label}</dt>
-              <dd className={String(label).startsWith('=') ? 'font-semibold text-neutral-900' : ''}>
-                <Money aed={amount as number} currency={currency} rate={rate} />
-              </dd>
-            </div>
-          ))}
+          <div className="flex justify-between gap-4">
+            <dt>Ingresos</dt>
+            <dd><Money aed={summary.income} currency={currency} rate={rate} /></dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt>− Gastado</dt>
+            <dd><Money aed={-summary.spent} currency={currency} rate={rate} /></dd>
+          </div>
           <div className="flex justify-between gap-4 border-t border-line pt-1 font-semibold">
-            <dt>= Restante</dt>
-            <dd className={summary.remaining < 0 ? 'text-red-700' : 'text-emerald-700'}>
-              <Money aed={summary.remaining} currency={currency} rate={rate} />
+            <dt className="text-neutral-900">= Balance</dt>
+            <dd className={summary.balance < 0 ? 'text-red-700' : 'text-emerald-700'}>
+              <Money aed={summary.balance} currency={currency} rate={rate} />
             </dd>
           </div>
         </dl>

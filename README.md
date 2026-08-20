@@ -12,8 +12,11 @@ mismos datos desde cualquier móvil u ordenador.
 - **Importes en AED o EUR.** Cada gasto se apunta en la moneda en la que se pagó y
   la app convierte con el tipo de cambio configurable (por defecto `1 AED = 0,24 €`).
   El interruptor de la cabecera cambia la moneda de toda la aplicación.
-- **Presupuesto del mes** = ingresos − gastos fijos. Lo que queda es el disponible
-  para gastos variables.
+- **El mes es real.** Ingresos y gastos se apuntan a mano; el balance del mes es
+  ingresos menos lo gastado. Ninguna previsión toca esas cifras.
+- **Previsiones** es una pestaña aparte: ingresos previstos menos gastos fijos
+  previstos da el margen del que se puede tirar para ahorrar, y se compara con lo
+  que de verdad se gastó de media.
 - **Registro semanal.** Los gastos se agrupan en semanas 1 a 5. Si se indica fecha,
   la semana se calcula sola (y el gasto se coloca en su mes).
 - **Ingresos por mes.** Si un mes cobráis algo distinto, se edita en la pestaña
@@ -79,7 +82,7 @@ src/lib/suggest.ts           Gastos habituales y categorías sugeridas
 src/lib/apply.ts             Operaciones sobre los datos, compartidas cliente/servidor
 src/lib/money.ts             Conversión AED/EUR, presupuesto y totales por categoría
 src/lib/store.tsx            Estado de la app y sincronización con el servidor
-src/components/              Pantallas: Mes, Año y Ajustes
+src/components/              Pantallas: Mes, Año y Previsiones
 scripts/extract_seed.py      Importador del Excel
 ```
 
@@ -92,8 +95,12 @@ script y sale byte a byte igual.
 
 Los meses que no tenían nada en el Excel —febrero, marzo y de agosto a
 diciembre— aparecen como **Sin datos**: no suman en los totales del año, no
-pintan barra en el gráfico, y al abrirlos se avisa de que los ingresos y gastos
-fijos que se ven son la previsión del *Resumen*, no cifras reales de ese mes.
+pintan barra en el gráfico, y al abrirlos se avisa de que los ingresos que se ven
+son la previsión, no lo que se cobró de verdad.
+
+Los 15 gastos fijos del Excel siguen en *Previsiones*. Son una estimación: no
+restan en ningún mes. Conviene dejar solo los que se saben seguro —el alquiler,
+por ejemplo— y quitar el resto con la ×.
 
 Donde el Excel no anotaba fecha, el movimiento sale como *Sin fecha* en lugar de
 inventarle una.
