@@ -4,12 +4,10 @@ import ExpenseDialog from './ExpenseDialog'
 import ImportDialog from './ImportDialog'
 import MonthIncomePanel from './MonthIncomePanel'
 import { Card, Money, Progress, Stat } from './ui'
-import { MONTH_NAMES, monthKey, summarizeMonth, toAED } from '../lib/money'
+import { MONTH_NAMES, groupByDay, monthKey, summarizeMonth, toAED } from '../lib/money'
 import { frequentConcepts } from '../lib/suggest'
 import { useData } from '../lib/store'
 import type { Currency, Transaction } from '../lib/types'
-
-const WEEKS = [1, 2, 3, 4, 5]
 
 export default function MonthView({ currency, month, onMonthChange }: {
   currency: Currency
@@ -36,6 +34,7 @@ export default function MonthView({ currency, month, onMonthChange }: {
   }
 
   const frequent = useMemo(() => frequentConcepts(data.transactions), [data.transactions])
+  const days = useMemo(() => groupByDay(transactions, month, rate), [transactions, month, rate])
 
   const openNew = (values?: Partial<Transaction>) => {
     setEditing(null)
@@ -134,56 +133,50 @@ export default function MonthView({ currency, month, onMonthChange }: {
         </div>
       )}
 
-      <Card title="Registro semanal">
+      <Card title="Movimientos">
         {transactions.length === 0 ? (
           <p className="py-6 text-center text-sm text-neutral-500">Todavía no hay gastos en este mes.</p>
         ) : (
           <div className="space-y-4">
-            {WEEKS.map((week) => {
-              const rows = transactions.filter((tx) => tx.week === week)
-              if (rows.length === 0) return null
-              const total = rows.reduce((sum, tx) => sum + toAED(tx.amount, tx.currency, rate), 0)
-              return (
-                <div key={week}>
-                  <div className="mb-1 flex items-baseline justify-between border-b border-line pb-1">
-                    <h3 className="text-xs font-medium text-neutral-500">Semana {week}</h3>
-                    <Money aed={total} currency={currency} rate={rate} className="text-sm font-semibold" />
-                  </div>
-                  <ul className="divide-y divide-line">
-                    {rows.map((tx) => (
-                      <li key={tx.id}>
-                        <button
-                          type="button"
-                          onClick={() => openEdit(tx)}
-                          className="flex w-full items-center justify-between gap-3 py-2 text-left hover:bg-neutral-50"
-                        >
-                          <span className="min-w-0">
-                            <span className="block truncate text-sm font-medium">{tx.concept}</span>
-                            <span className="text-xs text-neutral-500">
-                              {tx.category}
-                              {tx.date && ` · ${tx.date.slice(8)}/${tx.date.slice(5, 7)}`}
-                            </span>
-                          </span>
-                          <span className="shrink-0 text-right">
-                            <Money
-                              aed={toAED(tx.amount, tx.currency, rate)}
-                              currency={currency}
-                              rate={rate}
-                              className="text-sm font-semibold"
-                            />
-                            {tx.currency !== currency && (
-                              <span className="block text-[11px] text-neutral-400">
-                                {tx.amount.toLocaleString('es-ES')} {tx.currency}
-                              </span>
-                            )}
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+            {days.map((day) => (
+              <div key={day.key}>
+                <div className="mb-1 flex items-baseline justify-between border-b border-line pb-1">
+                  <h3 className={`text-xs font-medium ${day.dated ? 'text-neutral-900' : 'text-neutral-400'}`}>
+                    {day.label}
+                  </h3>
+                  <Money aed={day.total} currency={currency} rate={rate} className="text-sm font-semibold" />
                 </div>
-              )
-            })}
+                <ul className="divide-y divide-line">
+                  {day.items.map((tx) => (
+                    <li key={tx.id}>
+                      <button
+                        type="button"
+                        onClick={() => openEdit(tx)}
+                        className="flex w-full items-center justify-between gap-3 py-2 text-left hover:bg-neutral-50"
+                      >
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-medium">{tx.concept}</span>
+                          <span className="text-xs text-neutral-500">{tx.category}</span>
+                        </span>
+                        <span className="shrink-0 text-right">
+                          <Money
+                            aed={toAED(tx.amount, tx.currency, rate)}
+                            currency={currency}
+                            rate={rate}
+                            className="text-sm font-semibold"
+                          />
+                          {tx.currency !== currency && (
+                            <span className="block text-[11px] text-neutral-400">
+                              {tx.amount.toLocaleString('es-ES')} {tx.currency}
+                            </span>
+                          )}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         )}
       </Card>

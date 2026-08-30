@@ -17,8 +17,9 @@ mismos datos desde cualquier móvil u ordenador.
 - **Previsiones** es una pestaña aparte: ingresos previstos menos gastos fijos
   previstos da el margen del que se puede tirar para ahorrar, y se compara con lo
   que de verdad se gastó de media.
-- **Registro semanal.** Los gastos se agrupan en semanas 1 a 5. Si se indica fecha,
-  la semana se calcula sola (y el gasto se coloca en su mes).
+- **Ordenado por día.** Los gastos se agrupan por fecha, del más reciente al más
+  antiguo, con el total de cada día. Cambiar la fecha de un gasto lo mueve de día
+  y, si hace falta, de mes.
 - **Ingresos por mes.** Si un mes cobráis algo distinto, se edita en la pestaña
   *Mes* y queda guardado solo para ese mes; el resto sigue con el importe base.
 - **Apuntar rápido.** Tres atajos para no teclear de más: pegar el extracto del
@@ -102,8 +103,10 @@ Los 15 gastos fijos del Excel siguen en *Previsiones*. Son una estimación: no
 restan en ningún mes. Conviene dejar solo los que se saben seguro —el alquiler,
 por ejemplo— y quitar el resto con la ×.
 
-Donde el Excel no anotaba fecha, el movimiento sale como *Sin fecha* en lugar de
-inventarle una.
+Solo 101 de los 447 movimientos traían fecha en el Excel. Los otros 346 conservan
+la semana en la que estaban anotados y se agrupan como *Semana N · sin fecha*,
+colocados donde caía esa semana: ni se les inventa un día ni se pierden. Al
+editar uno se le puede poner la fecha real y pasa a su día.
 
 ## Apuntar rápido
 

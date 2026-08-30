@@ -142,6 +142,22 @@ export default function ExpenseDialog({ month, editing, prefill, onClose }: {
           </datalist>
         </div>
 
+        <div>
+          <label className="label" htmlFor="date">Fecha</label>
+          <input
+            id="date"
+            type="date"
+            className="field"
+            value={draft.date ?? ''}
+            onChange={(event) => setDate(event.target.value)}
+          />
+          {!draft.date && (
+            <p className="mt-1 text-xs text-neutral-500">
+              Sin fecha el gasto se agrupa aparte, al final del mes.
+            </p>
+          )}
+        </div>
+
         <div className="grid grid-cols-[1fr_auto] gap-2">
           <div>
             <label className="label" htmlFor="amount">Importe</label>
@@ -195,32 +211,6 @@ export default function ExpenseDialog({ month, editing, prefill, onClose }: {
               placeholder="Nombre de la categoría"
             />
           )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="label" htmlFor="date">Fecha (opcional)</label>
-            <input
-              id="date"
-              type="date"
-              className="field"
-              value={draft.date ?? ''}
-              onChange={(event) => setDate(event.target.value)}
-            />
-          </div>
-          <div>
-            <label className="label" htmlFor="week">Semana</label>
-            <select
-              id="week"
-              className="field"
-              value={draft.week}
-              onChange={(event) => patch({ week: Number(event.target.value) })}
-            >
-              {[1, 2, 3, 4, 5].map((week) => (
-                <option key={week} value={week}>Semana {week}</option>
-              ))}
-            </select>
-          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 pt-1">

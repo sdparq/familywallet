@@ -77,3 +77,55 @@ export const categoryTotals = (data: WalletData, month: string): CategoryTotal[]
   }
   return [...totals.values()].sort((a, b) => b.total - a.total)
 }
+
+export interface DayGroup {
+  key: string
+  label: string
+  /** Día del mes al que se ancla el grupo, para ordenarlos entre sí. */
+  anchor: string
+  dated: boolean
+  items: Transaction[]
+  total: number
+}
+
+const DAY_FORMAT = new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })
+
+const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
+
+/** 'YYYY-MM-DD' como fecha local: con `new Date(iso)` el día se desplaza por la zona horaria. */
+const localDate = (iso: string) =>
+  new Date(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10)))
+
+/**
+ * Agrupa los gastos de un mes por día, del más reciente al más antiguo.
+ * Los que vienen del Excel sin fecha se agrupan por su semana y se colocan
+ * donde caía esa semana, en lugar de inventarles un día.
+ */
+export const groupByDay = (transactions: Transaction[], month: string, rate: number): DayGroup[] => {
+  const groups = new Map<string, DayGroup>()
+
+  for (const tx of transactions) {
+    const dated = Boolean(tx.date)
+    const key = tx.date ?? `semana-${tx.week}`
+    let group = groups.get(key)
+    if (!group) {
+      group = {
+        key,
+        dated,
+        label: dated
+          ? capitalize(DAY_FORMAT.format(localDate(tx.date!)))
+          : `Semana ${tx.week} · sin fecha`,
+        anchor: dated ? tx.date! : `${month}-${String((tx.week - 1) * 7 + 1).padStart(2, '0')}`,
+        items: [],
+        total: 0,
+      }
+      groups.set(key, group)
+    }
+    group.items.push(tx)
+    group.total += toAED(tx.amount, tx.currency, rate)
+  }
+
+  return [...groups.values()].sort((a, b) =>
+    // Mismo día: primero el grupo con fecha, después el bloque sin fechar
+    b.anchor.localeCompare(a.anchor) || Number(b.dated) - Number(a.dated))
+}
