@@ -40,21 +40,25 @@ export default function MonthView({ currency, month, onMonthChange }: {
   const visible = onlyDuplicates ? transactions.filter((tx) => duplicates.has(tx.id)) : transactions
   const days = useMemo(() => groupByDay(visible, month, rate), [visible, month, rate])
 
-  // Al abrir un mes nuevo se apuntan solos los gastos que se repiten cada mes.
-  // El id es fijo por gasto y mes, así que abrirlo a la vez desde dos móviles no
-  // los duplica; y el mes queda marcado para que lo que se borre no reaparezca.
-  const seeded = useRef(new Set<string>())
+  // Al abrir un mes se apuntan solos los gastos que se repiten cada mes y que
+  // todavía no estén en él. Se anota gasto a gasto, no el mes entero: así marcar
+  // uno nuevo lo añade a un mes ya abierto sin resucitar lo que se haya borrado.
+  // El id es fijo por gasto y mes, de modo que abrirlo desde dos móviles a la
+  // vez tampoco lo duplica.
+  const seeding = useRef(new Set<string>())
   useEffect(() => {
     const { recurringFrom, fixedExpenses } = data.settings
     if (!recurringFrom || month < recurringFrom) return
-    if ((data.seededMonths ?? []).includes(month) || seeded.current.has(month)) return
 
-    const recurring = fixedExpenses.filter((item) => item.recurring && item.amount > 0)
-    if (recurring.length === 0) return
-    seeded.current.add(month)
+    const done = data.seededItems?.[month] ?? []
+    const pending = fixedExpenses.filter((item) =>
+      item.recurring && item.amount > 0 &&
+      !done.includes(item.id) && !seeding.current.has(`${month}/${item.id}`))
+    if (pending.length === 0) return
+    for (const item of pending) seeding.current.add(`${month}/${item.id}`)
 
     dispatch(
-      ...recurring.map((item) => ({
+      ...pending.map((item) => ({
         type: 'tx.add' as const,
         tx: {
           id: `fijo-${item.id}-${month}`,
@@ -67,9 +71,9 @@ export default function MonthView({ currency, month, onMonthChange }: {
           currency: item.currency,
         },
       })),
-      { type: 'months.markSeeded' as const, month },
+      { type: 'months.markSeeded' as const, month, itemIds: pending.map((item) => item.id) },
     )
-  }, [data.settings, data.seededMonths, month, dispatch])
+  }, [data.settings, data.seededItems, month, dispatch])
 
   const openNew = (values?: Partial<Transaction>) => {
     setEditing(null)

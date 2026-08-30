@@ -118,9 +118,10 @@ En *Previsiones*, cada gasto fijo tiene la casilla **Apuntarlo solo en cada mes
 nuevo**. Los marcados se añaden como movimientos reales la primera vez que se
 abre un mes, con fecha el día 1 (se puede cambiar como cualquier otro gasto).
 
-Vienen marcados seis: LinkedIn (22,99 AED), Claude suscripción (418,26 AED),
-Google One (21,99 €), Seguro España Santi (54,67 €), Seguro España Bea (67,79 €)
-y Fertilitas (151,25 €).
+Vienen marcados siete: Alquiler Piso (8.000 AED), LinkedIn (22,99 AED), Claude
+suscripción (418,26 AED), Google One (21,99 €), Seguro España Santi (54,67 €),
+Seguro España Bea (67,79 €) y Fertilitas (151,25 €). El resto de gastos fijos del
+Excel siguen siendo solo previsión hasta que se marquen.
 
 Reglas que evitan sorpresas:
 
@@ -128,8 +129,9 @@ Reglas que evitan sorpresas:
   los tenían apuntados en el Excel y no se tocan.
 - El id de cada movimiento es fijo por gasto y mes, así que abrir el mismo mes a
   la vez desde dos móviles no lo duplica.
-- El mes queda marcado en `seededMonths` en cuanto se siembra: si luego se borra
-  uno de esos gastos, no reaparece al volver a entrar.
+- Se anota gasto a gasto en `seededItems`, no el mes entero. Así, si luego se
+  borra uno, no reaparece al volver a entrar; y marcar un gasto nuevo como
+  recurrente lo añade también a un mes que ya estuviera abierto.
 
 ## Posibles duplicados
 

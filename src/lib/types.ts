@@ -53,7 +53,9 @@ export interface WalletData {
   savings: Record<SavingsGroup, SavingsItem[]>
   /** Ingresos que sustituyen a los de base en un mes concreto, por id. */
   monthIncomes: Record<string, LineItem[]>
-  /** Meses a los que ya se les han añadido los gastos recurrentes. */
+  /** Qué gastos recurrentes se han apuntado ya en cada mes, por id. */
+  seededItems?: Record<string, string[]>
+  /** Solo para migrar: la versión 2 anotaba el mes entero, no gasto a gasto. */
   seededMonths?: string[]
   transactions: Transaction[]
 }
@@ -65,4 +67,4 @@ export type Op =
   | { type: 'settings.set'; patch: Partial<WalletData['settings']> }
   | { type: 'savings.set'; group: SavingsGroup; items: SavingsItem[] }
   | { type: 'monthIncomes.set'; month: string; items: LineItem[] | null }
-  | { type: 'months.markSeeded'; month: string }
+  | { type: 'months.markSeeded'; month: string; itemIds: string[] }

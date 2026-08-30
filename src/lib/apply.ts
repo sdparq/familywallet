@@ -39,8 +39,10 @@ export const applyOp = (data: WalletData, op: Op): WalletData => {
       return { ...data, savings: { ...data.savings, [op.group]: op.items } }
     }
     case 'months.markSeeded': {
-      const seeded = data.seededMonths ?? []
-      return seeded.includes(op.month) ? data : { ...data, seededMonths: [...seeded, op.month] }
+      const seeded = data.seededItems ?? {}
+      const already = seeded[op.month] ?? []
+      const merged = [...new Set([...already, ...op.itemIds])]
+      return { ...data, seededItems: { ...seeded, [op.month]: merged } }
     }
     case 'monthIncomes.set': {
       const monthIncomes = { ...data.monthIncomes }
