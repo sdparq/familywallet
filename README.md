@@ -19,6 +19,8 @@ mismos datos desde cualquier móvil u ordenador.
   que de verdad se gastó de media.
 - **Gastos que se repiten.** Un gasto fijo marcado como recurrente se apunta solo
   al abrir cada mes nuevo, con su importe, moneda y categoría.
+- **Posibles duplicados.** Dentro de un mes, los gastos con el mismo concepto e
+  importe se resaltan en rojo y se pueden ver aparte.
 - **Ordenado por día.** Los gastos se agrupan por fecha, del más reciente al más
   antiguo, con el total de cada día. Cambiar la fecha de un gasto lo mueve de día
   y, si hace falta, de mes.
@@ -128,6 +130,17 @@ Reglas que evitan sorpresas:
   la vez desde dos móviles no lo duplica.
 - El mes queda marcado en `seededMonths` en cuanto se siembra: si luego se borra
   uno de esos gastos, no reaparece al volver a entrar.
+
+## Posibles duplicados
+
+Dos gastos del mismo mes con **el mismo concepto, importe y moneda** se marcan en
+rojo, con la etiqueta *posible duplicado*. La cabecera de la lista dice cuántos
+hay y permite ver solo esos.
+
+No se exige que coincida la fecha, porque la mayoría de los movimientos que
+vienen del Excel no la tienen. Es una sospecha, no una certeza: un comercio puede
+cobrar lo mismo dos veces de verdad, así que la app solo lo señala y nunca borra
+nada. Sobre los 447 movimientos del Excel marca 8, en cuatro parejas.
 
 ## Apuntar rápido
 

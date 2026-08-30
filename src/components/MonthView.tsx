@@ -5,6 +5,7 @@ import ImportDialog from './ImportDialog'
 import MonthIncomePanel from './MonthIncomePanel'
 import { Card, Money, Progress, Stat } from './ui'
 import { MONTH_NAMES, groupByDay, monthKey, summarizeMonth, toAED } from '../lib/money'
+import { findDuplicates } from '../lib/duplicates'
 import { frequentConcepts } from '../lib/suggest'
 import { useData } from '../lib/store'
 import type { Currency, Transaction } from '../lib/types'
@@ -20,6 +21,7 @@ export default function MonthView({ currency, month, onMonthChange }: {
   const [prefill, setPrefill] = useState<Partial<Transaction> | undefined>()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
+  const [onlyDuplicates, setOnlyDuplicates] = useState(false)
 
   const summary = useMemo(() => summarizeMonth(data, month), [data, month])
   const transactions = useMemo(
@@ -34,7 +36,9 @@ export default function MonthView({ currency, month, onMonthChange }: {
   }
 
   const frequent = useMemo(() => frequentConcepts(data.transactions), [data.transactions])
-  const days = useMemo(() => groupByDay(transactions, month, rate), [transactions, month, rate])
+  const duplicates = useMemo(() => findDuplicates(transactions), [transactions])
+  const visible = onlyDuplicates ? transactions.filter((tx) => duplicates.has(tx.id)) : transactions
+  const days = useMemo(() => groupByDay(visible, month, rate), [visible, month, rate])
 
   // Al abrir un mes nuevo se apuntan solos los gastos que se repiten cada mes.
   // El id es fijo por gasto y mes, así que abrirlo a la vez desde dos móviles no
@@ -164,9 +168,26 @@ export default function MonthView({ currency, month, onMonthChange }: {
         </div>
       )}
 
-      <Card title="Movimientos">
+      <Card
+        title="Movimientos"
+        action={(duplicates.size > 0 || onlyDuplicates) && (
+          <button
+            type="button"
+            className="text-xs text-red-700 underline hover:text-red-800"
+            onClick={() => setOnlyDuplicates((current) => !current)}
+          >
+            {onlyDuplicates
+              ? 'Ver todos'
+              : `${duplicates.size} posibles duplicados`}
+          </button>
+        )}
+      >
         {transactions.length === 0 ? (
           <p className="py-6 text-center text-sm text-neutral-500">Todavía no hay gastos en este mes.</p>
+        ) : visible.length === 0 ? (
+          <p className="py-6 text-center text-sm text-neutral-500">
+            Ya no queda ningún posible duplicado.
+          </p>
         ) : (
           <div className="space-y-4">
             {days.map((day) => (
@@ -183,11 +204,20 @@ export default function MonthView({ currency, month, onMonthChange }: {
                       <button
                         type="button"
                         onClick={() => openEdit(tx)}
-                        className="flex w-full items-center justify-between gap-3 py-2 text-left hover:bg-neutral-50"
+                        className={`flex w-full items-center justify-between gap-3 py-2 text-left ${
+                          duplicates.has(tx.id)
+                            ? 'border-l-2 border-red-600 bg-red-50 pl-2 hover:bg-red-100'
+                            : 'hover:bg-neutral-50'
+                        }`}
                       >
                         <span className="min-w-0">
                           <span className="block truncate text-sm font-medium">{tx.concept}</span>
-                          <span className="text-xs text-neutral-500">{tx.category}</span>
+                          <span className="text-xs text-neutral-500">
+                            {tx.category}
+                            {duplicates.has(tx.id) && (
+                              <span className="text-red-700"> · posible duplicado</span>
+                            )}
+                          </span>
                         </span>
                         <span className="shrink-0 text-right">
                           <Money
