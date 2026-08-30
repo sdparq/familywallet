@@ -2,6 +2,7 @@ import { getStore } from '@netlify/blobs'
 import type { Config } from '@netlify/functions'
 import seed from '../../src/data/seed.json'
 import { applyOp } from '../../src/lib/apply'
+import { migrate } from '../../src/lib/migrate'
 import type { Op, WalletData } from '../../src/lib/types'
 
 const KEY = 'wallet'
@@ -19,10 +20,16 @@ const matches = (given: string, expected: string) => {
 
 const store = () => getStore({ name: 'familywallet', consistency: 'strong' })
 
-/** La primera vez que se abre la app no hay nada guardado: se parte del Excel. */
-const load = async (): Promise<WalletData> => {
-  const saved = await store().get(KEY, { type: 'json' })
-  return (saved as WalletData | null) ?? (seed as WalletData)
+/**
+ * La primera vez que se abre la app no hay nada guardado: se parte del Excel.
+ * Lo guardado se pone al día, y se avisa si hay que volver a escribirlo: si la
+ * migración no se persiste, lo que el usuario borre después reaparecería.
+ */
+const load = async (): Promise<{ data: WalletData; migrated: boolean }> => {
+  const saved = (await store().get(KEY, { type: 'json' })) as WalletData | null
+  const before = saved ?? (seed as WalletData)
+  const data = migrate(before)
+  return { data, migrated: data !== before }
 }
 
 export default async (request: Request) => {
@@ -34,7 +41,11 @@ export default async (request: Request) => {
     return json({ error: 'Contraseña incorrecta' }, 401)
   }
 
-  if (request.method === 'GET') return json({ data: await load() })
+  if (request.method === 'GET') {
+    const { data, migrated } = await load()
+    if (migrated) await store().setJSON(KEY, data)
+    return json({ data })
+  }
 
   if (request.method === 'POST') {
     let ops: Op[]
@@ -46,7 +57,7 @@ export default async (request: Request) => {
     if (!Array.isArray(ops) || ops.length === 0) return json({ error: 'No hay operaciones' }, 400)
 
     try {
-      const data = ops.reduce(applyOp, await load())
+      const data = ops.reduce(applyOp, (await load()).data)
       await store().setJSON(KEY, data)
       return json({ data })
     } catch (error) {

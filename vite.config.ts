@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import type { Plugin } from 'vite'
 import { applyOp } from './src/lib/apply'
+import { migrate } from './src/lib/migrate'
 import type { WalletData } from './src/lib/types'
 
 const LOCAL_DB = '.local-wallet.json'
@@ -16,7 +17,7 @@ const localApi = (): Plugin => ({
   name: 'familywallet-local-api',
   configureServer(server) {
     const load = (): WalletData =>
-      JSON.parse(readFileSync(existsSync(LOCAL_DB) ? LOCAL_DB : SEED, 'utf8'))
+      migrate(JSON.parse(readFileSync(existsSync(LOCAL_DB) ? LOCAL_DB : SEED, 'utf8')))
 
     server.middlewares.use('/api/data', (request, response, next) => {
       if (request.headers['x-wallet-key'] !== (process.env.APP_PASSWORD ?? 'dubai')) {

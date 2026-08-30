@@ -38,6 +38,10 @@ export const applyOp = (data: WalletData, op: Op): WalletData => {
       if (!SAVINGS_GROUPS.includes(op.group)) throw new Error('Grupo de ahorro desconocido')
       return { ...data, savings: { ...data.savings, [op.group]: op.items } }
     }
+    case 'months.markSeeded': {
+      const seeded = data.seededMonths ?? []
+      return seeded.includes(op.month) ? data : { ...data, seededMonths: [...seeded, op.month] }
+    }
     case 'monthIncomes.set': {
       const monthIncomes = { ...data.monthIncomes }
       if (op.items) monthIncomes[op.month] = op.items

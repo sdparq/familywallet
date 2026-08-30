@@ -100,6 +100,20 @@ export default function ForecastView({ currency }: { currency: Currency }) {
               ×
             </button>
             </div>
+            {key === 'fixedExpenses' && (
+              <label className="flex items-center gap-2 text-xs text-neutral-500 sm:col-span-4">
+                <input
+                  type="checkbox"
+                  className="h-3.5 w-3.5"
+                  checked={Boolean(item.recurring)}
+                  onChange={(event) =>
+                    setList(key, items.map((other) => other.id === item.id
+                      ? { ...other, recurring: event.target.checked } : other))}
+                />
+                Apuntarlo solo en cada mes nuevo
+                {item.recurring && item.category && ` · ${item.category}`}
+              </label>
+            )}
           </li>
         ))}
       </ul>
@@ -152,7 +166,7 @@ export default function ForecastView({ currency }: { currency: Currency }) {
 
       {renderList('incomes', incomes, 'Ingresos previstos')}
       {renderList('fixedExpenses', fixedExpenses, 'Gastos fijos previstos',
-        'Son los del Excel. Deja solo los que sabéis seguro (el alquiler, por ejemplo) y quita el resto con la ×; los gastos reales de cada mes se apuntan en la pestaña Mes.')}
+        'Los marcados se apuntan solos al abrir cada mes nuevo. Los demás son solo previsión: quita con la × los que no sepáis seguro.')}
 
       <Card title="Tipo de cambio">
         <label className="grid grid-cols-[1fr_8rem] items-center gap-3">

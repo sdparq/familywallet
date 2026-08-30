@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import CategoryPanel from './CategoryPanel'
 import ExpenseDialog from './ExpenseDialog'
 import ImportDialog from './ImportDialog'
@@ -14,7 +14,7 @@ export default function MonthView({ currency, month, onMonthChange }: {
   month: string
   onMonthChange: (month: string) => void
 }) {
-  const { data } = useData()
+  const { data, dispatch } = useData()
   const { rate } = data.settings
   const [editing, setEditing] = useState<Transaction | null>(null)
   const [prefill, setPrefill] = useState<Partial<Transaction> | undefined>()
@@ -35,6 +35,37 @@ export default function MonthView({ currency, month, onMonthChange }: {
 
   const frequent = useMemo(() => frequentConcepts(data.transactions), [data.transactions])
   const days = useMemo(() => groupByDay(transactions, month, rate), [transactions, month, rate])
+
+  // Al abrir un mes nuevo se apuntan solos los gastos que se repiten cada mes.
+  // El id es fijo por gasto y mes, así que abrirlo a la vez desde dos móviles no
+  // los duplica; y el mes queda marcado para que lo que se borre no reaparezca.
+  const seeded = useRef(new Set<string>())
+  useEffect(() => {
+    const { recurringFrom, fixedExpenses } = data.settings
+    if (!recurringFrom || month < recurringFrom) return
+    if ((data.seededMonths ?? []).includes(month) || seeded.current.has(month)) return
+
+    const recurring = fixedExpenses.filter((item) => item.recurring && item.amount > 0)
+    if (recurring.length === 0) return
+    seeded.current.add(month)
+
+    dispatch(
+      ...recurring.map((item) => ({
+        type: 'tx.add' as const,
+        tx: {
+          id: `fijo-${item.id}-${month}`,
+          month,
+          week: 1,
+          date: `${month}-01`,
+          concept: item.name,
+          category: item.category ?? 'Otros',
+          amount: item.amount,
+          currency: item.currency,
+        },
+      })),
+      { type: 'months.markSeeded' as const, month },
+    )
+  }, [data.settings, data.seededMonths, month, dispatch])
 
   const openNew = (values?: Partial<Transaction>) => {
     setEditing(null)
