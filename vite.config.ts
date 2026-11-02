@@ -16,8 +16,36 @@ const SEED = 'src/data/seed.json'
 const localApi = (): Plugin => ({
   name: 'familywallet-local-api',
   configureServer(server) {
+    // En local la contraseña es 'dubai' salvo que se defina otra; el handler real
+    // de /api/sms lee esta misma variable, así los dos caminos coinciden
+    process.env.APP_PASSWORD ??= 'dubai'
+    process.env.FAMILYWALLET_LOCAL_DB = LOCAL_DB
+
     const load = (): WalletData =>
       migrate(JSON.parse(readFileSync(existsSync(LOCAL_DB) ? LOCAL_DB : SEED, 'utf8')))
+
+    // El endpoint de SMS usa el handler real, igual que en Netlify
+    server.middlewares.use('/api/sms', (request, response, next) => {
+      if (request.method !== 'POST') return next()
+      const chunks: Buffer[] = []
+      request.on('data', (chunk: Buffer) => chunks.push(chunk))
+      request.on('end', async () => {
+        try {
+          const module = await server.ssrLoadModule('/netlify/functions/sms.mts')
+          const result: Response = await module.default(new Request('http://local/api/sms', {
+            method: 'POST',
+            headers: { 'x-wallet-key': String(request.headers['x-wallet-key'] ?? '') },
+            body: Buffer.concat(chunks),
+          }))
+          response.statusCode = result.status
+          response.setHeader('content-type', 'application/json')
+          response.end(await result.text())
+        } catch (error) {
+          response.statusCode = 500
+          response.end(JSON.stringify({ error: (error as Error).message }))
+        }
+      })
+    })
 
     server.middlewares.use('/api/data', (request, response, next) => {
       if (request.headers['x-wallet-key'] !== (process.env.APP_PASSWORD ?? 'dubai')) {

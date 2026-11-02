@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { MONTH_NAMES, monthKey, sumAED, summarizeMonth } from '../lib/money'
 import { useData } from '../lib/store'
 import type { Currency, LineItem } from '../lib/types'
+import SmsSetup from './SmsSetup'
 import { Card, Money, NumberField } from './ui'
 
 const slug = (name: string) =>
@@ -181,6 +182,8 @@ export default function ForecastView({ currency }: { currency: Currency }) {
           Euros por dírham. Se usa para convertir todos los importes entre AED y EUR.
         </p>
       </Card>
+
+      <SmsSetup />
 
       <Card title="Categorías">
         <div className="flex flex-wrap gap-2">

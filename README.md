@@ -21,6 +21,8 @@ mismos datos desde cualquier móvil u ordenador.
   al abrir cada mes nuevo, con su importe, moneda y categoría.
 - **Posibles duplicados.** Dentro de un mes, los gastos con el mismo concepto e
   importe se resaltan en rojo y se pueden ver aparte.
+- **Gastos por SMS.** El iPhone puede reenviar el aviso del banco y el gasto se
+  apunta solo, sin tocar la app.
 - **Ordenado por día.** Los gastos se agrupan por fecha, del más reciente al más
   antiguo, con el total de cada día. Cambiar la fecha de un gasto lo mueve de día
   y, si hace falta, de mes.
@@ -143,6 +145,27 @@ No se exige que coincida la fecha, porque la mayoría de los movimientos que
 vienen del Excel no la tienen. Es una sospecha, no una certeza: un comercio puede
 cobrar lo mismo dos veces de verdad, así que la app solo lo señala y nunca borra
 nada. Sobre los 447 movimientos del Excel marca 8, en cuatro parejas.
+
+## Apuntar por SMS (iPhone)
+
+El banco manda un SMS con cada compra. Un atajo del iPhone lo reenvía a
+`POST /api/sms` y el gasto entra solo, con la categoría deducida del histórico.
+Los pasos están en la pestaña *Previsiones*, que además muestra la dirección del
+sitio y deja probar un SMS real sin guardar nada.
+
+El atajo manda `{"text": "<contenido del mensaje>"}` con la cabecera
+`x-wallet-key`. También acepta el SMS como texto plano.
+
+`src/lib/sms.ts` es deliberadamente prudente: ante la duda no apunta nada y
+responde por qué. Descarta los OTP y los códigos de verificación, los abonos
+(nóminas, devoluciones, traspasos entrantes), la publicidad y los importes en
+divisas distintas de AED y EUR. Del mensaje coge el importe del gasto, nunca el
+saldo que suele ir detrás, y si el banco da divisa y dírhams se queda con los
+dírhams. El identificador del movimiento sale del texto del SMS, así que un
+reenvío no lo duplica.
+
+Si con los SMS de vuestro banco no acierta, el probador de *Previsiones* dice
+qué entiende y el analizador se ajusta.
 
 ## Apuntar rápido
 
